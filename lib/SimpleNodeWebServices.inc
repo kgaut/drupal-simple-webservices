@@ -3,6 +3,8 @@
 abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type;
   protected static $content_type_label;
+  protected static $results_keys_to_keep = ['nid','title','created','updated','uri'];
+
 
   public static function getDefinition() {
     return [
@@ -60,11 +62,25 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     if (!user_access('administer nodes')) {
       $node_select->condition('status', 1);
     }
-    dd(static::$content_type);
     $node_select->condition('type',static::$content_type);
 
     $results = services_resource_execute_index_query($node_select);
-
+    $results = static::filterResults($results);
     return services_resource_build_index_list($results, 'node', 'nid');
+  }
+
+  public static function filterResults($results) {
+    $results_filtred = [];
+
+    foreach ($results as $result) {
+      $result_filtred = new stdClass();
+      foreach ($result as $key => $value) {
+        if(in_array($key,static::$results_keys_to_keep)) {
+          $result_filtred->{$key} = $value;
+        }
+      }
+      $results_filtred[] = $result_filtred;
+    }
+    return $results_filtred;
   }
 }
