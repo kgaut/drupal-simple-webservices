@@ -4,5 +4,6 @@ package = ACAPS
 core = 7.x
 files[] = lib/WebServiceInterface.inc
 files[] = lib/SimpleWebService.inc
+files[] = lib/SimpleNodeWebService.inc
 
 dependencies[] = services
