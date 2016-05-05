@@ -1,14 +1,14 @@
 <?php
 
 abstract class SimpleNodeWebService extends SimpleWebService {
-  public static $content_type;
-  public static $content_type_label;
+  protected static $content_type;
+  protected static $content_type_label;
 
   public static function getDefinition() {
     return [
       'operations' => [
         'index' => [
-          'callback' => 'SimpleNodeWebService::getNodeList',
+          'callback' => get_called_class().'::getNodeList',
           'args' => array(
             array(
               'name' => 'page',
@@ -60,7 +60,8 @@ abstract class SimpleNodeWebService extends SimpleWebService {
     if (!user_access('administer nodes')) {
       $node_select->condition('status', 1);
     }
-    $node_select->condition('type', 'theme_page');
+    dd(static::$content_type);
+    $node_select->condition('type',static::$content_type);
 
     $results = services_resource_execute_index_query($node_select);
 
