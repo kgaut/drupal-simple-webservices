@@ -3,7 +3,7 @@
 abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type;
   protected static $content_type_label;
-  protected static $results_keys_to_keep = ['nid','title','created','updated','uri'];
+  protected static $results_keys_to_keep = ['nid','title','created','changed','uri'];
 
 
   public static function getDefinition() {
@@ -19,6 +19,38 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'description' => 'The zero-based index of the page to get, defaults to 0.',
               'default value' => 0,
               'source' => array('param' => 'page'),
+            ),
+            array(
+              'name' => 'order',
+              'optional' => TRUE,
+              'type' => 'string',
+              'description' => 'The fieldname to order on',
+              'default value' => 'title',
+              'source' => array('param' => 'order'),
+            ),
+            array(
+              'name' => 'direction',
+              'optional' => TRUE,
+              'type' => 'string',
+              'description' => 'The direction for ordering',
+              'default value' => 'ASC',
+              'source' => array('param' => 'direction'),
+            ),
+            array(
+              'name' => 'created_after',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'Content created after given timestamp',
+              'default value' => null,
+              'source' => array('param' => 'created_after'),
+            ),
+            array(
+              'name' => 'changed_after',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'Content created/updated after given timestamp',
+              'default value' => null,
+              'source' => array('param' => 'changed_after'),
             ),
             array(
               'name' => 'fields',
@@ -51,17 +83,23 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     ];
   }
 
-  public static function getNodeList($page, $fields, $parameters, $page_size) {
+  public static function getNodeList($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size) {
     $node_select = db_select('node', 't')
       ->addTag('node_access')
-      ->orderBy('sticky', 'DESC')
-      ->orderBy('created', 'DESC');
+      ->orderBy($order, $direction);
 
     services_resource_build_index_query($node_select, $page, $fields, $parameters, $page_size, 'node');
 
     if (!user_access('administer nodes')) {
       $node_select->condition('status', 1);
     }
+    if($created_after && is_numeric($created_after)) {
+      $node_select->condition('created',$created_after,'>');
+    }
+    if($changed_after && is_numeric($changed_after)) {
+      $node_select->condition('changed',$changed_after,'>');
+    }
+
     $node_select->condition('type',static::$content_type);
 
     $results = services_resource_execute_index_query($node_select);
