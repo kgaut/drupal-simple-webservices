@@ -1,6 +1,8 @@
-name = Simple Web Service
+name = Simple Web Services
 description = Classes to play with services API in order to easily create new ressources
 package = ACAPS
 core = 7.x
 files[] = lib/WebServiceInterface.inc
 files[] = lib/SimpleWebService.inc
+
+dependencies[] = services
