@@ -1,5 +1,5 @@
 <?php
 
-interface WebServiceInterface {
+interface WebServicesInterface {
   public static function getDefinition();
 }

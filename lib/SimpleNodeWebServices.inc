@@ -1,6 +1,6 @@
 <?php
 
-abstract class SimpleNodeWebService extends SimpleWebService {
+abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type;
   protected static $content_type_label;
 
