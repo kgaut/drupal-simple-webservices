@@ -2,6 +2,7 @@
 
 abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type;
+  protected static $content_type_path;
   protected static $content_type_label;
   protected static $results_keys_to_keep = ['nid','title','created','changed','uri'];
 
@@ -78,6 +79,21 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
             ),
           ),
           'access arguments' => array('access content'),
+        ],
+        'retrieve' => [
+          'callback' => get_called_class().'::getNodeDetails',
+          'args' => [
+            [
+              'name' => 'nid',
+              'optional' => FALSE,
+              'source' => ['path' => 0],
+              'type' => 'int',
+              'description' => 'The nid of the node to get',
+            ],
+          ],
+          'access callback' => '_node_resource_access',
+          'access arguments' => ['view'],
+          'access arguments append' => TRUE,
         ]
       ]
     ];
@@ -104,12 +120,28 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
 
     $results = services_resource_execute_index_query($node_select);
     $results = static::filterResults($results);
-    return services_resource_build_index_list($results, 'node', 'nid');
+    return $results;
   }
 
-  public static function filterResults($results) {
-    $results_filtred = [];
+  public static function getNodeDetails($nid) {
+    $node = node_load($nid);
 
+    if ($node) {
+      $uri = entity_uri('node', $node);
+      $node->path = url($uri['path'], array('absolute' => TRUE));
+      // Unset uri as it has complete entity and this
+      // cause never ending recursion in rendering.
+      unset($node->uri);
+    }
+    //Lets check field_permissions
+    $node = services_field_permissions_clean('view', 'node', $node);
+    return $node;
+  }
+
+  protected static function filterResults($results) {
+    $results_filtred = [];
+    $endpoint_name = services_get_server_info('endpoint');
+    $endpoint = services_endpoint_load($endpoint_name);
     foreach ($results as $result) {
       $result_filtred = new stdClass();
       foreach ($result as $key => $value) {
@@ -117,6 +149,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
           $result_filtred->{$key} = $value;
         }
       }
+      $result_filtred->uri = url('/'.$endpoint->path.'/'.static::$content_type_path.'/'.$result_filtred->nid, array('absolute' => TRUE));
       $results_filtred[] = $result_filtred;
     }
     return $results_filtred;
