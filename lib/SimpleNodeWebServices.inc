@@ -100,7 +100,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   }
 
   public static function getNodeList($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size) {
-    self::checkAccess();
+    static::checkAccess();
     $node_select = db_select('node', 't')
       ->addTag('node_access')
       ->orderBy($order, $direction);
@@ -125,7 +125,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   }
 
   public static function getNodeDetails($nid) {
-    self::checkAccess();
+    static::checkAccess();
     $node = node_load($nid);
 
     if ($node) {
