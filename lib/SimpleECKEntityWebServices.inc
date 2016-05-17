@@ -102,12 +102,20 @@ abstract class SimpleECKEntityWebServices extends SimpleWebServices {
 
   public static function getEntitiesList($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size) {
     static::checkAccess();
+    $query = static::getEntitiesListQuery($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size);
+
+    $results = services_resource_execute_index_query($query);
+    $results = static::filterResults($results);
+    return $results;
+  }
+
+  public static function getEntitiesListQuery($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size) {
     $query = new EntityFieldQuery();
 
     $query->entityCondition('entity_type', static::$entity_type)
-          ->entityCondition('bundle', static::$entity_bundle)
-          ->propertyOrderBy($order,$direction)
-          ->range($page * $page_size, $page_size);
+      ->entityCondition('bundle', static::$entity_bundle)
+      ->propertyOrderBy($order,$direction)
+      ->range($page * $page_size, $page_size);
 
     if (isset($parameters) && is_array($parameters)) {
       foreach ($parameters as $parameter => $parameter_value) {
@@ -121,9 +129,7 @@ abstract class SimpleECKEntityWebServices extends SimpleWebServices {
     if($changed_after && is_numeric($changed_after)) {
       $query->condition('changed',$changed_after,'>');
     }
-    $results = services_resource_execute_index_query($query);
-    $results = static::filterResults($results);
-    return $results;
+    return $query;
   }
 
   protected static function filterResults($results) {
