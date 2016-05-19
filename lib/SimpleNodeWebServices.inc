@@ -27,7 +27,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'optional' => TRUE,
               'type' => 'string',
               'description' => 'The fieldname to order on',
-              'default value' => 'title',
+              'default value' => 'created',
               'source' => array('param' => 'order'),
             ),
             array(
@@ -35,7 +35,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'optional' => TRUE,
               'type' => 'string',
               'description' => 'The direction for ordering',
-              'default value' => 'ASC',
+              'default value' => 'DESC',
               'source' => array('param' => 'direction'),
             ),
             array(
