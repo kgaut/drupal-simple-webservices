@@ -5,6 +5,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type_path;
   protected static $content_type_label;
   protected static $results_keys_to_keep = ['nid','title','created','changed','uri'];
+  protected static $result_details_keys_to_remove = ['rdf_mapping','data','tnid','translate','promote','sticky','comment','log','print_pdf_size','print_pdf_orientation'];
 
 
   public static function getDefinition() {
@@ -138,10 +139,14 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     if ($node) {
       $uri = entity_uri('node', $node);
       $node->path = url($uri['path'], array('absolute' => TRUE));
-      // Unset uri as it has complete entity and this
-      // cause never ending recursion in rendering.
       unset($node->uri);
     }
+    foreach (static::$result_details_keys_to_remove as $field_to_remove) {
+      if(isset($node->{$field_to_remove})) {
+        unset($node->{$field_to_remove});
+      }
+    }
+
     //Lets check field_permissions
     $node = services_field_permissions_clean('view', 'node', $node);
     return $node;
