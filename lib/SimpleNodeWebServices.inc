@@ -99,13 +99,23 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     ];
   }
 
-  public static function getNodeList($page, $order, $direction, $created_after, $changed_after, $fields, $parameters, $page_size) {
+  public static function getNodeList($page, $order, $direction, $created_after, $changed_after,  $page_size) {
     static::checkAccess();
+    $query = static::getNodeListQuery($page, $order, $direction, $created_after, $changed_after, $page_size);
+
+    $results = services_resource_execute_index_query($query);
+    $results = static::filterResults($results);
+    return $results;
+  }
+
+  public static function getNodeListQuery($page, $order, $direction, $created_after, $changed_after, $page_size) {
     $node_select = db_select('node', 't')
       ->addTag('node_access')
       ->orderBy($order, $direction);
 
-    services_resource_build_index_query($node_select, $page, $fields, $parameters, $page_size, 'node');
+    $node_select->range($page * $page_size, $page_size);
+    $node_select->fields('t');
+
 
     if (!user_access('administer nodes')) {
       $node_select->condition('status', 1);
@@ -118,10 +128,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     }
 
     $node_select->condition('type',static::$content_type);
-
-    $results = services_resource_execute_index_query($node_select);
-    $results = static::filterResults($results);
-    return $results;
+    return $node_select;
   }
 
   public static function getNodeDetails($nid) {

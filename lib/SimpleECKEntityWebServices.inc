@@ -142,7 +142,6 @@ abstract class SimpleECKEntityWebServices extends SimpleWebServices {
     $results_filtred = [];
     $endpoint_name = services_get_server_info('endpoint');
     $endpoint = services_endpoint_load($endpoint_name);
-    dd($endpoint);
     foreach($results[static::$entity_bundle] as $entity) {
       $entity = entity_load(static::$entity_bundle,array($entity->id));
       $entity = array_pop($entity);
