@@ -55,27 +55,11 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'source' => array('param' => 'changed_after'),
             ),
             array(
-              'name' => 'fields',
-              'optional' => TRUE,
-              'type' => 'string',
-              'description' => 'The fields to get.',
-              'default value' => '*',
-              'source' => array('param' => 'fields'),
-            ),
-            array(
-              'name' => 'parameters',
-              'optional' => TRUE,
-              'type' => 'array',
-              'description' => 'Parameters array',
-              'default value' => array(),
-              'source' => array('param' => 'parameters'),
-            ),
-            array(
               'name' => 'pagesize',
               'optional' => TRUE,
               'type' => 'int',
               'description' => 'Number of records to get per page.',
-              'default value' => variable_get('services_node_index_page_size', 20),
+              'default value' => 20,
               'source' => array('param' => 'pagesize'),
             ),
           ),
@@ -112,9 +96,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   public static function getNodeListQuery($page, $order, $direction, $created_after, $changed_after, $page_size) {
     $node_select = db_select('node', 't')
       ->addTag('node_access')
-      ->orderBy($order, $direction);
-
-    $node_select->range($page * $page_size, $page_size);
+      ->orderBy($order, $direction);$node_select->range($page * $page_size, $page_size);
     $node_select->fields('t');
 
 
