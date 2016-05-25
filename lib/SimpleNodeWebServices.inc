@@ -5,7 +5,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type_path;
   protected static $content_type_label;
   protected static $results_keys_to_keep = ['nid','title','created','changed','uri'];
-  protected static $result_details_keys_to_remove = ['rdf_mapping','data','tnid','translate','promote','sticky','comment','log','print_pdf_size','print_pdf_orientation'];
+  protected static $result_details_keys_to_remove = ['language','vid','rdf_mapping','data','tnid','translate','promote','sticky','comment','log','print_pdf_size','print_pdf_orientation','revision_timestamp','revision_uid'];
 
 
   public static function getDefinition() {
@@ -114,26 +114,6 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     return $node_select;
   }
 
-  public static function getNodeDetails($nid) {
-    static::checkAccess();
-    $node = node_load($nid);
-
-    if ($node) {
-      $uri = entity_uri('node', $node);
-      $node->path = url($uri['path'], array('absolute' => TRUE));
-      unset($node->uri);
-    }
-    foreach (static::$result_details_keys_to_remove as $field_to_remove) {
-      if(isset($node->{$field_to_remove})) {
-        unset($node->{$field_to_remove});
-      }
-    }
-
-    //Lets check field_permissions
-    $node = services_field_permissions_clean('view', 'node', $node);
-    return $node;
-  }
-
   protected static function filterResults($results) {
     $results_filtred = [];
     $endpoint_name = services_get_server_info('endpoint');
@@ -150,4 +130,31 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     }
     return $results_filtred;
   }
+
+  public static function getNodeDetails($nid) {
+    static::checkAccess();
+    $node = node_load($nid);
+
+    if ($node) {
+      $uri = entity_uri('node', $node);
+      $node->path = url($uri['path'], array('absolute' => TRUE));
+      unset($node->uri);
+    }
+
+    static::filterSingleResult($node);
+
+    //Lets check field_permissions
+    $node = services_field_permissions_clean('view', 'node', $node);
+    return $node;
+  }
+
+  protected static function filterSingleResult(&$node) {
+
+    foreach (static::$result_details_keys_to_remove as $field_to_remove) {
+      if(isset($node->{$field_to_remove})) {
+        unset($node->{$field_to_remove});
+      }
+    }
+  }
+
 }
