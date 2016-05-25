@@ -141,6 +141,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
       unset($node->uri);
     }
 
+    static::getAdditionalData($node);
     static::filterSingleResult($node);
 
     //Lets check field_permissions
@@ -148,8 +149,10 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
     return $node;
   }
 
-  protected static function filterSingleResult(&$node) {
+  protected static function getAdditionalData(&$node) {
+  }
 
+  protected static function filterSingleResult(&$node) {
     foreach (static::$result_details_keys_to_remove as $field_to_remove) {
       if(isset($node->{$field_to_remove})) {
         unset($node->{$field_to_remove});
