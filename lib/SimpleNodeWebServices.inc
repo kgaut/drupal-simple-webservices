@@ -101,7 +101,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
 
 
     if (!user_access('administer nodes')) {
-      $node_select->condition('status', 1);
+      $node_select->condition('t.status', 1);
     }
     if($created_after && is_numeric($created_after)) {
       $node_select->condition('created',$created_after,'>');
