@@ -1,6 +1,6 @@
 <?php
 
-abstract class SimpleECKEntityWebServices extends SimpleWebServices {
+abstract class SimpleEntityWebServices extends SimpleWebServices {
   protected static $entity_type;
   protected static $entity_bundle;
   protected static $content_type_path;
