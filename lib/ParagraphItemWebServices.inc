@@ -31,7 +31,7 @@ abstract class ParagraphItemWebServices extends SimpleEntityWebServices {
           'optional' => TRUE,
           'type' => 'string',
           'description' => 'The fieldname to order on',
-          'default value' => 'created',
+          'default value' => 'item_id',
           'source' => array('param' => 'order'),
         ),
         array(
@@ -129,25 +129,13 @@ abstract class ParagraphItemWebServices extends SimpleEntityWebServices {
       }
     }
 
-    if($created_after && is_numeric($created_after)) {
-      $query->condition('created',$created_after,'>');
-    }
-    if($changed_after && is_numeric($changed_after)) {
-      $query->condition('changed',$changed_after,'>');
-    }
     return $query;
   }
 
   protected static function filterResults($results) {
     $results_filtred = [];
-    $endpoint_name = services_get_server_info('endpoint');
-    $endpoint = services_endpoint_load($endpoint_name);
-    foreach($results[static::$entity_bundle] as $entity) {
-      $entity = entity_load(static::$entity_bundle,array($entity->id));
-      $entity = array_pop($entity);
-      if(static::$has_retrieve) {
-        $entity->uri = url('/'.$endpoint->path.'/'.static::$content_type_path.'/'.$entity->id, array('absolute' => TRUE));
-      }
+    foreach($results[static::$entity_type] as $entity) {
+      $entity = paragraphs_item_load($entity->item_id);
       $results_filtred[] = $entity;
     }
     return $results_filtred;
