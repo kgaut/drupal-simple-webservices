@@ -83,7 +83,7 @@ abstract class SimpleEntityWebServices extends SimpleWebServices {
           'source' => array('param' => 'pagesize'),
         ),
       ),
-      'access arguments' => array('access content'),
+      'access callback' => get_called_class().'::checkAccess',
     ];
 
     if(static::$has_retrieve) {
@@ -98,9 +98,7 @@ abstract class SimpleEntityWebServices extends SimpleWebServices {
             'description' => 'The nid of the node to get',
           ],
         ],
-        'access callback' => '_node_resource_access',
-        'access arguments' => ['view'],
-        'access arguments append' => TRUE,
+        'access callback' => get_called_class().'::checkAccess',
       ];
     }
     return $definition;

@@ -1,0 +1,5 @@
+<?php
+function simple_webservices_install() {
+  variable_set('webservices_security_salt',sha1(rand().date('Ymd')));
+}
+

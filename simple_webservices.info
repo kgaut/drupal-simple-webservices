@@ -7,5 +7,6 @@ files[] = lib/SimpleWebServices.inc
 files[] = lib/SimpleNodeWebServices.inc
 files[] = lib/SimpleEntityWebServices.inc
 files[] = lib/ParagraphItemWebServices.inc
+files[] = lib/WebServiceSecurtyTrait.inc
 
 dependencies[] = services

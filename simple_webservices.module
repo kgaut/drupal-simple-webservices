@@ -1,0 +1,35 @@
+<?php
+function simple_webservices_menu() {
+  $items = array();
+  $items['admin/config/system/webservices'] = array(
+    'title' => 'Webservices Security',
+    'description' => 'Security config for webservices',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_webservices_settings_form'),
+    'access arguments' => array('administer sws security'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+
+function simple_webservices_permission() {
+  $permissions = array (
+    'administer sws security' => array (
+      'title' => t('Administer simple web services security'),
+    ),
+  );
+  return $permissions;
+}
+
+function simple_webservices_settings_form($form, &$form_state) {
+  $form['webservices_security_salt'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Security Salt'),
+    '#default_value' => variable_get('webservices_security_salt'),
+    '#required' => TRUE,
+    '#maxlength' => 512
+  );
+  return system_settings_form($form);
+
+}

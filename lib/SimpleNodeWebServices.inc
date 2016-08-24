@@ -5,7 +5,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   protected static $content_type_path;
   protected static $content_type_label;
   protected static $results_keys_to_keep = ['nid','title','created','changed','uri'];
-  protected static $result_details_keys_to_remove = ['language','vid','rdf_mapping','data','tnid','translate','promote','sticky','comment','log','print_pdf_size','print_pdf_orientation','revision_timestamp','revision_uid'];
+  protected static $result_details_keys_to_remove = ['language','type','title_field','vid','rdf_mapping','data','tnid','translate','promote','sticky','comment','log','print_pdf_size','print_pdf_orientation','revision_timestamp','revision_uid'];
 
 
   public static function getDefinition() {
@@ -63,7 +63,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'source' => array('param' => 'pagesize'),
             ),
           ),
-          'access arguments' => array('access content'),
+          'access callback' => get_called_class().'::checkAccess',
         ],
         'retrieve' => [
           'callback' => get_called_class().'::getNodeDetails',
@@ -76,9 +76,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
               'description' => 'The nid of the node to get',
             ],
           ],
-          'access callback' => '_node_resource_access',
-          'access arguments' => ['view'],
-          'access arguments append' => TRUE,
+          'access callback' => get_called_class().'::checkAccess',
         ]
       ]
     ];
@@ -150,6 +148,7 @@ abstract class SimpleNodeWebServices extends SimpleWebServices {
   }
 
   protected static function getAdditionalData(&$node) {
+    $node->sharing_url = url('node/'.$node->nid,['absolute'=>true]);
   }
 
   protected static function filterSingleResult(&$node) {
